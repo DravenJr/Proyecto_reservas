@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Portal API</title>
+    <title>Portal de Reservas</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -12,27 +12,125 @@
         }
         h1 {
             color: #cc0000;
-            margin-bottom: 40px;
+            margin-bottom: 30px;
         }
         .btn {
             display: inline-block;
             margin: 10px;
-            padding: 15px 25px;
-            font-size: 18px;
+            padding: 10px 20px;
+            font-size: 16px;
             text-decoration: none;
             color: white;
             background: #007bff;
             border-radius: 5px;
-            transition: background 0.3s;
+            cursor: pointer;
         }
         .btn:hover {
             background: #0056b3;
+        }
+        table {
+            margin: 20px auto;
+            border-collapse: collapse;
+            width: 80%;
+        }
+        th, td {
+            padding: 10px;
+            border: 1px solid #ccc;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        input, select {
+            padding: 8px;
+            margin: 5px;
         }
     </style>
 </head>
 <body>
     <h1>Portal de Reservas</h1>
-    <a href="/bookings-page" class="btn">Ver Reservas</a>
-    <a href="/bookings-page" class="btn">Crear Reserva</a>  
+
+    <h2>Crear Nueva Reserva</h2>
+    <form id="booking-form">
+        <input type="number" name="field_id" placeholder="ID de Cancha" required>
+        <input type="datetime-local" name="start" required>
+        <input type="datetime-local" name="end" required>
+        <button type="submit" class="btn">Crear Reserva</button>
+    </form>
+
+    <h2>Mis Reservas</h2>
+    <table id="bookings-table">
+        <thead>
+            <tr>
+                <th>ID Reserva</th>
+                <th>ID Cancha</th>
+                <th>Inicio</th>
+                <th>Fin</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+
+    <script>
+        const apiUrl = "http://127.0.0.1:8003/api/bookings/";
+
+        async function cargarReservas() {
+            try {
+                const response = await fetch(apiUrl, {
+                    credentials: "include" // enviar cookies de sesión si usas auth
+                });
+                const bookings = await response.json();
+                const tbody = document.querySelector("#bookings-table tbody");
+                tbody.innerHTML = "";
+
+                bookings.forEach(b => {
+                    const tr = document.createElement("tr");
+                    tr.innerHTML = `
+                        <td>${b.id}</td>
+                        <td>${b.field_id}</td>
+                        <td>${b.start}</td>
+                        <td>${b.end}</td>
+                        <td>${b.status}</td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+            } catch (error) {
+                console.error("Error al cargar reservas:", error);
+            }
+        }
+
+        document.getElementById("booking-form").addEventListener("submit", async (e) => {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            const data = {
+                field_id: parseInt(formData.get("field_id")),
+                start: formData.get("start"),
+                end: formData.get("end")
+            };
+
+            try {
+                const response = await fetch(apiUrl, {
+                    method: "POST",
+                    credentials: "include",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(data)
+                });
+
+                if (response.ok) {
+                    alert("Reserva creada correctamente");
+                    e.target.reset();
+                    cargarReservas();
+                } else {
+                    const err = await response.json();
+                    alert("Error: " + JSON.stringify(err));
+                }
+            } catch (error) {
+                console.error("Error al crear reserva:", error);
+            }
+        });
+
+        // Cargar reservas al iniciar la página
+        cargarReservas();
+    </script>
 </body>
 </html>
