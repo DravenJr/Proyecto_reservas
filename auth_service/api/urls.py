@@ -1,4 +1,3 @@
-
 from django.urls import path
 from .views import RegisterView, ProfileView, HomeView
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView

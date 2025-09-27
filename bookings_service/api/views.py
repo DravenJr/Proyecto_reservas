@@ -15,7 +15,6 @@ class BookingViewSet(viewsets.ModelViewSet):
             return Booking.objects.all().order_by('-start')
         return Booking.objects.filter(user_id=user.id).order_by('-start')
 
-    #Mensaje para usuarios no autenticados al intentar acceder a la API
     def list(self, request, *args, **kwargs):
         if not request.user.is_authenticated:
             return Response(
