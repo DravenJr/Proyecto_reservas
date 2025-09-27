@@ -1,6 +1,13 @@
 from rest_framework import viewsets, permissions
+from django.shortcuts import render
 from .models import Booking
 from .serializers import BookingSerializer
+
+class HomeView(generics.GenericAPIView):
+    permission_classes = (permissions.AllowAny,)
+
+    def get(self, request):
+        return render(request, "booking_index.html")
 
 class BookingViewSet(viewsets.ModelViewSet):
     queryset = Booking.objects.all().order_by('-start')
