@@ -1,0 +1,117 @@
+version: '3.8'
+
+services:
+  # RabbitMQ para mensajería asíncrona (opcional)
+  rabbitmq:
+    image: rabbitmq:3-management
+    ports:
+      - "15672:15672" # UI management
+      - "5672:5672"
+
+  api_gateway:
+    build: ./api_gateway
+    ports:
+      - "8080:8080"
+    depends_on:
+      - auth_service
+      - roles_service
+      - fields_service
+      - bookings_service
+      - admin_dashboard
+
+  auth_service:
+    build: ./auth_service
+    ports:
+      - "8000:8000"
+    environment:
+      - DATABASE_URL=postgres://postgres:postgres@auth_service_db:5432/auth_service
+    depends_on:
+      - auth_service_db
+
+  auth_service_db:
+    image: postgres:15
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=auth_service
+    volumes:
+      - auth_service_pgdata:/var/lib/postgresql/data
+
+  roles_service:
+    build: ./roles_service
+    ports:
+      - "8001:8000"
+    environment:
+      - DATABASE_URL=postgres://postgres:postgres@roles_service_db:5432/roles_service
+    depends_on:
+      - roles_service_db
+
+  roles_service_db:
+    image: postgres:15
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=roles_service
+    volumes:
+      - roles_service_pgdata:/var/lib/postgresql/data
+
+  fields_service:
+    build: ./fields_service
+    ports:
+      - "8002:8000"
+    environment:
+      - DATABASE_URL=postgres://postgres:postgres@fields_service_db:5432/fields_service
+    depends_on:
+      - fields_service_db
+
+  fields_service_db:
+    image: postgres:15
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=fields_service
+    volumes:
+      - fields_service_pgdata:/var/lib/postgresql/data
+
+  bookings_service:
+    build: ./bookings_service
+    ports:
+      - "8003:8000"
+    environment:
+      - DATABASE_URL=postgres://postgres:postgres@bookings_service_db:5432/bookings_service
+    depends_on:
+      - bookings_service_db
+
+  bookings_service_db:
+    image: postgres:15
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=bookings_service
+    volumes:
+      - bookings_service_pgdata:/var/lib/postgresql/data
+
+  admin_dashboard:
+    build: ./admin_dashboard
+    ports:
+      - "8004:8000"
+    environment:
+      - DATABASE_URL=postgres://postgres:postgres@admin_dashboard_db:5432/admin_dashboard
+    depends_on:
+      - admin_dashboard_db
+
+  admin_dashboard_db:
+    image: postgres:15
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=admin_dashboard
+    volumes:
+      - admin_dashboard_pgdata:/var/lib/postgresql/data
+
+volumes:
+  auth_service_pgdata:
+  roles_service_pgdata:
+  fields_service_pgdata:
+  bookings_service_pgdata:
+  admin_dashboard_pgdata:
