@@ -5,12 +5,24 @@ import httpx
 import os
 
 app = FastAPI()
-
 templates = Jinja2Templates(directory="templates")
 
+# ===== Ruta principal =====
 @app.get("/", response_class=HTMLResponse)
 async def home(request: Request):
     return templates.TemplateResponse("index.html", {"request": request})
+
+@app.get("/bookings-page", response_class=HTMLResponse)
+async def bookings_page(request: Request):
+    # TODO: reemplazar con tu lógica real de autenticación
+    user_authenticated = False
+
+    if not user_authenticated:
+        message = "Necesitas estar logueado para acceder a este servicio"
+
+        return templates.TemplateResponse("index.html", {"request": request, "messages": [message]})
+
+    return templates.TemplateResponse("bookings.html", {"request": request})
 
 SERVICE_MAP = {
     '/auth': os.environ.get('AUTH_URL', 'http://auth_service:8000'),
