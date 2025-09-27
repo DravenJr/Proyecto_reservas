@@ -6,7 +6,7 @@
     <style>
         body {
             font-family: Arial, sans-serif;
-            background-color: #f5f7fa;
+            background-color: #ffe5e5; /* fondo rojo claro */
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -16,11 +16,16 @@
         }
 
         h1 {
-            color: #333;
+            color: #b30000; /* rojo oscuro */
             margin-bottom: 40px;
         }
 
-        .buttons {
+        h2 {
+            color: #b30000;
+            margin-top: 30px;
+        }
+
+        .buttons, .login-form {
             display: flex;
             flex-direction: column;
             gap: 15px;
@@ -28,7 +33,7 @@
 
         a.button {
             text-decoration: none;
-            background-color: #4CAF50;
+            background-color: #007BFF; /* azul */
             color: white;
             padding: 15px 30px;
             border-radius: 8px;
@@ -38,16 +43,117 @@
         }
 
         a.button:hover {
-            background-color: #45a049;
+            background-color: #0056b3;
+        }
+
+        input, button {
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            font-size: 16px;
+            width: 250px;
+        }
+
+        button {
+            background-color: #007BFF;
+            color: white;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        #loginResult {
+            margin-top: 10px;
+            font-weight: bold;
         }
     </style>
 </head>
 <body>
     <h1>Bienvenido al Portal de Auth</h1>
+
+    <!-- Botón de registro -->
     <div class="buttons">
-        <a href="/register/" class="button">Registrarse</a>
-        <a href="/login/" class="button">Login</a>
-        <a href="/me/" class="button">Mi Perfil</a>
+        <a href="/auth/register/" class="button">Registrarse</a>
     </div>
+
+    <!-- Login con formulario POST -->
+    <h2>Login</h2>
+    <form id="loginForm" class="login-form">
+        <input type="text" name="username" placeholder="Usuario" required>
+        <input type="password" name="password" placeholder="Contraseña" required>
+        <button type="submit">Login</button>
+    </form>
+
+    <div id="loginResult"></div>
+
+    <script>
+        const form = document.getElementById('loginForm');
+        const resultDiv = document.getElementById('loginResult');
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const username = form.username.value;
+            const password = form.password.value;
+
+            try {
+                const response = await fetch('/auth/login/', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({username, password})
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    // Guardar tokens JWT en localStorage
+                    localStorage.setItem('access', data.access);
+                    localStorage.setItem('refresh', data.refresh);
+                    resultDiv.style.color = 'green';
+                    resultDiv.innerText = 'Login exitoso! Puedes acceder a "Mi Perfil"';
+                } else {
+                    resultDiv.style.color = 'red';
+                    resultDiv.innerText = data.detail || 'Usuario o contraseña incorrectos';
+                }
+            } catch (err) {
+                resultDiv.style.color = 'red';
+                resultDiv.innerText = 'Error de conexión';
+            }
+        });
+
+        // Botón de perfil solo accesible si hay token JWT
+        document.addEventListener('DOMContentLoaded', () => {
+            const profileButton = document.createElement('a');
+            profileButton.href = '#';
+            profileButton.className = 'button';
+            profileButton.innerText = 'Mi Perfil';
+            profileButton.style.marginTop = '20px';
+            document.body.appendChild(profileButton);
+
+            profileButton.addEventListener('click', async (e) => {
+                e.preventDefault();
+                const token = localStorage.getItem('access');
+                if (!token) {
+                    alert('Debes iniciar sesión primero.');
+                    return;
+                }
+
+                try {
+                    const resp = await fetch('/auth/me/', {
+                        headers: { 'Authorization': 'Bearer ' + token }
+                    });
+                    if (resp.ok) {
+                        const profile = await resp.json();
+                        alert(`Usuario: ${profile.username}\nEmail: ${profile.email}`);
+                    } else {
+                        alert('Error al obtener perfil. Token inválido o expirado.');
+                    }
+                } catch (err) {
+                    alert('Error de conexión al servidor');
+                }
+            });
+        });
+    </script>
 </body>
 </html>
