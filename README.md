@@ -12,4 +12,4 @@ Jose Velasquez
 ## Notas importantes
 - Cada microservicio es un proyecto Django independiente. Debe ejecutar `python manage.py migrate` dentro de cada contenedor la primera vez.
 - En este scaffold las comunicaciones entre servicios se realizan por HTTP (API REST). Para eventos asíncronos use RabbitMQ y defina consumidores/productores en los servicios.
-- Protección: use HTTPS, gestione secretos con un vault y no exponga bases de datos directamente en producción.
+- Protección: use HTTPS, gestione secretos con un vault.
