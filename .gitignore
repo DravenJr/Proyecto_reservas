@@ -1,0 +1,25 @@
+# ---- Python ----
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# ---- Entorno virtual ----
+venv/
+ENV/
+.env
+
+# ---- Bases de datos locales ----
+*.sqlite3
+
+# ---- Archivos del sistema ----
+.DS_Store
+Thumbs.db
+
+# ---- Logs ----
+*.log
+
+# ---- Docker ----
+*.pid
+*.seed
+docker-data/
