@@ -1,11 +1,9 @@
 import os
 from fastapi import FastAPI, Request, Response
 from fastapi.responses import HTMLResponse
-from fastapi.templating import Jinja2Templates
 import httpx
 
 app = FastAPI()
-templates = Jinja2Templates(directory="templates")
 
 # ===== Definición de servicios =====
 SERVICE_MAP = {
@@ -16,22 +14,39 @@ SERVICE_MAP = {
     '/admin': os.environ.get('ADMIN_URL', 'http://admin_dashboard:8000'),
 }
 
-# ===== Ruta principal: proxy hacia auth_service =====
+# ===== Ruta principal: muestra el login de auth_service =====
 @app.get("/", response_class=HTMLResponse)
 async def home(request: Request):
-    auth_url = SERVICE_MAP['/auth'] + '/'
+    auth_url = SERVICE_MAP['/auth'] + '/'  # URL de login del auth_service
     async with httpx.AsyncClient() as client:
-        resp = await client.get(auth_url)
+        # Sobrescribimos el header Host para evitar DisallowedHost en Django
+        headers = {'Host': 'auth_service'}  
+        resp = await client.get(auth_url, headers=headers)
     return HTMLResponse(content=resp.text, status_code=resp.status_code)
 
-# ===== Página de reservas =====
-@app.get("/bookings-page", response_class=HTMLResponse)
-async def bookings_page(request: Request):
-    user_authenticated = False
-    if not user_authenticated:
-        message = "Necesitas estar logueado para acceder a este servicio"
-        return templates.TemplateResponse("index.html", {"request": request, "messages": [message]})
-    return templates.TemplateResponse("bookings.html", {"request": request})
+# ===== Proxy específico para /auth/* =====
+@app.api_route('/auth/{path:path}', methods=['GET','POST','PUT','PATCH','DELETE'])
+async def auth_proxy(path: str, request: Request):
+    target_base = SERVICE_MAP['/auth']
+    url = target_base + '/' + path
+
+    async with httpx.AsyncClient() as client:
+        headers = dict(request.headers)
+        headers['Host'] = 'auth_service'  # evita DisallowedHost
+        body = await request.body()
+        resp = await client.request(
+            request.method,
+            url,
+            headers=headers,
+            content=body,
+            params=request.query_params
+        )
+
+    return Response(
+        content=resp.content,
+        status_code=resp.status_code,
+        headers=resp.headers
+    )
 
 # ===== Proxy genérico para otros servicios =====
 @app.api_route('/{path:path}', methods=['GET','POST','PUT','PATCH','DELETE'])
@@ -59,9 +74,13 @@ async def proxy(path: str, request: Request):
 
     async with httpx.AsyncClient() as client:
         headers = dict(request.headers)
+        # Si el target es auth_service, sobrescribimos Host
+        if prefix == '/auth':
+            headers['Host'] = 'auth_service'
         body = await request.body()
         resp = await client.request(
-            request.method, url,
+            request.method,
+            url,
             headers=headers,
             content=body,
             params=request.query_params
