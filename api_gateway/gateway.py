@@ -26,10 +26,10 @@ async def proxy(path: str, request: Request):
     target_base = None
     prefix = None
 
-    for p in SERVICE_MAP.keys():
-        if full_path.startswith(p.lstrip('/')) or full_path.startswith(p):
+    for p, target in SERVICE_MAP.items():
+        if full_path.startswith(p):
             prefix = p
-            target_base = SERVICE_MAP[p]
+            target_base = target
             break
 
     if not target_base:
