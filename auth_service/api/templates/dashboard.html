@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Panel de Usuario</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+            gap: 20px;
+        }
+
+        .button {
+            text-decoration: none;
+            background-color: #007BFF;
+            color: white;
+            padding: 15px 30px;
+            border-radius: 8px;
+            font-weight: bold;
+            text-align: center;
+            transition: background-color 0.3s;
+            width: 200px;
+        }
+
+        .button:hover {
+            background-color: #0056b3;
+        }
+
+        #welcome {
+            font-size: 24px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div id="welcome">Bienvenido</div>
+
+    <a href="/fields-page/" class="button">Canchas</a>
+    <a href="/bookings-page/" class="button">Reservar</a>
+    <a href="/profile-page/" class="button">Configuración</a>
+    <button id="logoutBtn" class="button">Cerrar Sesión</button>
+
+    <script>
+        const token = localStorage.getItem('access_token');
+
+        // Si no hay token, redirige al login
+        if (!token) {
+            window.location.href = '/';
+        } else {
+            // Obtener info del usuario usando el token
+            fetch('/auth/me/', {
+                headers: {
+                    'Authorization': 'Bearer ' + token
+                }
+            })
+            .then(res => {
+                if (!res.ok) {
+                    throw new Error('Token inválido o expirado');
+                }
+                return res.json();
+            })
+            .then(data => {
+                const welcomeDiv = document.getElementById('welcome');
+                welcomeDiv.textContent = `Bienvenido, ${data.username}`;
+            })
+            .catch(err => {
+                console.error(err);
+                localStorage.removeItem('access_token');
+                localStorage.removeItem('refresh_token');
+                window.location.href = '/';
+            });
+        }
+
+        // Cerrar sesión
+        const logoutBtn = document.getElementById('logoutBtn');
+        logoutBtn.addEventListener('click', () => {
+            localStorage.removeItem('access_token');
+            localStorage.removeItem('refresh_token');
+            window.location.href = '/';
+        });
+    </script>
+</body>
+</html>

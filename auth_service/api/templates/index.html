@@ -81,16 +81,16 @@
     <script>
         const form = document.getElementById('loginForm');
         const resultDiv = document.getElementById('loginResult');
-
+    
         form.addEventListener('submit', async (e) => {
             e.preventDefault();
-
+    
             const formData = new FormData(form);
             const data = {
                 username: formData.get('username'),
                 password: formData.get('password')
             };
-
+    
             try {
                 const response = await fetch('/auth/login/', {
                     method: 'POST',
@@ -99,21 +99,26 @@
                     },
                     body: JSON.stringify(data)
                 });
-
+    
                 const resData = await response.json();
-
+    
                 if (response.ok) {
-                    // Login exitoso, guardar token en localStorage o cookies
+                    // Login exitoso, guardar token en localStorage
                     localStorage.setItem('access_token', resData.access);
                     localStorage.setItem('refresh_token', resData.refresh);
                     resultDiv.style.color = 'green';
-                    resultDiv.textContent = 'Login exitoso! Puedes acceder a tus reservas.';
+                    resultDiv.textContent = 'Login exitoso! Redirigiendo...';
+    
+                    // 🔹 Redirigir al dashboard o página de reservas
+                    setTimeout(() => {
+                        window.location.href = '/dashboard/'; // Cambia esta URL según tu routing
+                    }, 1000); // Espera 1 segundo antes de redirigir
                 } else {
                     // Mostrar error
                     resultDiv.style.color = 'red';
                     resultDiv.textContent = resData.error || 'Error en login';
                 }
-
+    
             } catch (error) {
                 resultDiv.style.color = 'red';
                 resultDiv.textContent = 'Error de conexión con el servidor';
@@ -121,5 +126,6 @@
             }
         });
     </script>
+    
 </body>
 </html>

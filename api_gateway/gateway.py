@@ -1,29 +1,13 @@
+import os
 from fastapi import FastAPI, Request, Response
 from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
 import httpx
-import os
 
 app = FastAPI()
 templates = Jinja2Templates(directory="templates")
 
-# ===== Ruta principal =====
-@app.get("/", response_class=HTMLResponse)
-async def home(request: Request):
-    return templates.TemplateResponse("index.html", {"request": request})
-
-@app.get("/bookings-page", response_class=HTMLResponse)
-async def bookings_page(request: Request):
-    # TODO: reemplazar con tu lógica real de autenticación
-    user_authenticated = False
-
-    if not user_authenticated:
-        message = "Necesitas estar logueado para acceder a este servicio"
-
-        return templates.TemplateResponse("index.html", {"request": request, "messages": [message]})
-
-    return templates.TemplateResponse("bookings.html", {"request": request})
-
+# ===== Definición de servicios =====
 SERVICE_MAP = {
     '/auth': os.environ.get('AUTH_URL', 'http://auth_service:8000'),
     '/roles': os.environ.get('ROLES_URL', 'http://roles_service:8000'),
@@ -32,6 +16,24 @@ SERVICE_MAP = {
     '/admin': os.environ.get('ADMIN_URL', 'http://admin_dashboard:8000'),
 }
 
+# ===== Ruta principal: proxy hacia auth_service =====
+@app.get("/", response_class=HTMLResponse)
+async def home(request: Request):
+    auth_url = SERVICE_MAP['/auth'] + '/'
+    async with httpx.AsyncClient() as client:
+        resp = await client.get(auth_url)
+    return HTMLResponse(content=resp.text, status_code=resp.status_code)
+
+# ===== Página de reservas =====
+@app.get("/bookings-page", response_class=HTMLResponse)
+async def bookings_page(request: Request):
+    user_authenticated = False
+    if not user_authenticated:
+        message = "Necesitas estar logueado para acceder a este servicio"
+        return templates.TemplateResponse("index.html", {"request": request, "messages": [message]})
+    return templates.TemplateResponse("bookings.html", {"request": request})
+
+# ===== Proxy genérico para otros servicios =====
 @app.api_route('/{path:path}', methods=['GET','POST','PUT','PATCH','DELETE'])
 async def proxy(path: str, request: Request):
     full_path = '/' + path
