@@ -12,6 +12,7 @@
             justify-content: center;
             min-height: 100vh;
             margin: 0;
+            background-color: #f0f2f5;
         }
 
         .buttons, .login-form {
@@ -22,7 +23,7 @@
 
         a.button {
             text-decoration: none;
-            background-color: #007BFF; /* azul */
+            background-color: #007BFF;
             color: white;
             padding: 15px 30px;
             border-radius: 8px;
@@ -56,15 +57,14 @@
         #loginResult {
             margin-top: 10px;
             font-weight: bold;
-            color: red;
         }
     </style>
 </head>
 <body>
-    <!-- Login con formulario POST -->
     <div style="color: black;">
         <h1>Login</h1>
     </div>
+
     <form id="loginForm" class="login-form">
         <input type="text" name="username" placeholder="Usuario" required>
         <input type="password" name="password" placeholder="Contraseña" required>
@@ -75,7 +75,7 @@
 
     <!-- Botón de registro -->
     <div class="buttons">
-        <a href="/auth/register/" class="button">Registrarse</a>
+        <a href="/register/" class="button">Registrarse</a>
     </div>
 
     <script>
@@ -92,7 +92,8 @@
             };
     
             try {
-                const response = await fetch('/auth/login/', {
+                // URL corregida a tu endpoint real de DRF
+                const response = await fetch('/login/', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
@@ -103,20 +104,20 @@
                 const resData = await response.json();
     
                 if (response.ok) {
-                    // Login exitoso, guardar token en localStorage
+                    // Login exitoso, guardar tokens en localStorage
                     localStorage.setItem('access_token', resData.access);
                     localStorage.setItem('refresh_token', resData.refresh);
                     resultDiv.style.color = 'green';
                     resultDiv.textContent = 'Login exitoso! Redirigiendo...';
     
-                    // 🔹 Redirigir al dashboard o página de reservas
+                    // Redirigir al dashboard o página principal
                     setTimeout(() => {
                         window.location.href = '/dashboard/'; // Cambia esta URL según tu routing
-                    }, 1000); // Espera 1 segundo antes de redirigir
+                    }, 1000);
                 } else {
-                    // Mostrar error
+                    // Mostrar error correctamente según Simple JWT
                     resultDiv.style.color = 'red';
-                    resultDiv.textContent = resData.error || 'Error en login';
+                    resultDiv.textContent = resData.detail || 'Error en login';
                 }
     
             } catch (error) {
@@ -126,6 +127,5 @@
             }
         });
     </script>
-    
 </body>
 </html>

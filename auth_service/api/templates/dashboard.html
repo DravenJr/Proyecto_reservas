@@ -13,6 +13,7 @@
             min-height: 100vh;
             margin: 0;
             gap: 20px;
+            background-color: #f0f2f5;
         }
 
         .button {
@@ -34,6 +35,7 @@
         #welcome {
             font-size: 24px;
             font-weight: bold;
+            color: #333;
         }
     </style>
 </head>
@@ -53,7 +55,7 @@
             window.location.href = '/';
         } else {
             // Obtener info del usuario usando el token
-            fetch('/auth/me/', {
+            fetch('/me/', {  // ⚠ URL corregida
                 headers: {
                     'Authorization': 'Bearer ' + token
                 }
