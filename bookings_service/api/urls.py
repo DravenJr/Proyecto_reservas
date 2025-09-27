@@ -3,9 +3,9 @@ from rest_framework.routers import DefaultRouter
 from .views import BookingViewSet, HomeView
 
 router = DefaultRouter()
-router.register('bookings', BookingViewSet)
+router.register(r'bookings', BookingViewSet, basename='booking')
 
 urlpatterns = [
-    path('', HomeView.as_view(), name='api_home'),
-    path('', include(router.urls)),
+    path('', HomeView.as_view(), name='index'),
+    path('api/', include(router.urls)),
 ]

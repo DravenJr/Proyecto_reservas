@@ -6,23 +6,12 @@
     <style>
         body {
             font-family: Arial, sans-serif;
-            background-color: #ffe5e5; /* fondo rojo claro */
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
             min-height: 100vh;
             margin: 0;
-        }
-
-        h1 {
-            color: #b30000; /* rojo oscuro */
-            margin-bottom: 40px;
-        }
-
-        h2 {
-            color: #b30000;
-            margin-top: 30px;
         }
 
         .buttons, .login-form {
@@ -71,22 +60,11 @@
     </style>
 </head>
 <body>
-    <h1>Bienvenido al Portal de Auth</h1>
-
-    <!-- Botón de registro -->
-    <div class="buttons">
-        <a href="/auth/register/" class="button">Registrarse</a>
-    </div>
 
     <!-- Login con formulario POST -->
-    <h2>Login</h2>
-    <form id="loginForm" class="login-form">
-        <input type="text" name="username" placeholder="Usuario" required>
-        <input type="password" name="password" placeholder="Contraseña" required>
-        <button type="submit">Login</button>
-    </form>
-
-    <div id="loginResult"></div>
+    <div style="background-color: red; color: white;">
+        <h1>Login</h1>
+    </div>
 
     <script>
         const form = document.getElementById('loginForm');
@@ -155,5 +133,20 @@
             });
         });
     </script>
+
+    
+    <form id="loginForm" class="login-form">
+        <input type="text" name="username" placeholder="Usuario" required>
+        <input type="password" name="password" placeholder="Contraseña" required>
+        <button type="submit">Login</button>
+    </form>
+
+    <div id="loginResult"></div>
+
+    <!-- Botón de registro -->
+    <div class="buttons">
+        <a href="/auth/register/" class="button">Registrarse</a>
+    </div>
+
 </body>
 </html>

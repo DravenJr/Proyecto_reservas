@@ -32,7 +32,15 @@
       transition: background 0.3s;
     }
     .btn:hover {
-      background:rgb(69, 69, 255)
+      background: rgb(69, 69, 255);
+    }
+    /* Estilo para mensajes flash */
+    .messages {
+      list-style: none;
+      padding: 0;
+      margin: 20px auto;
+      max-width: 400px;
+      color: red;
     }
   </style>
 </head>
@@ -40,13 +48,22 @@
   <header>
     Sistema de Reservas de Canchas
   </header>
+
   <main>
+    {% if messages %}
+      <ul class="messages">
+        {% for message in messages %}
+          <li>{{ message }}</li>
+        {% endfor %}
+      </ul>
+    {% endif %}
+
     <h1>Bienvenido</h1>
     <p>Selecciona un servicio:</p>
     <a href="/auth" class="btn">Autenticación</a>
     <a href="/roles" class="btn">Roles</a>
     <a href="/fields" class="btn">Canchas</a>
-    <a href="/bookings" class="btn">Reservas</a>
+    <a href="/bookings-page" class="btn">Reservas</a>
     <a href="/admin" class="btn">Dashboard</a>
   </main>
 </body>
