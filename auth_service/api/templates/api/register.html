@@ -77,11 +77,12 @@
             };
 
             try {
-                const res = await fetch('/auth/register/', {  // <-- prefijo /auth agregado
+                const res = await fetch('/register/', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(data)
                 });
+
 
                 if (res.ok) {
                     message.style.color = 'green';

@@ -15,42 +15,33 @@
             background-color: #f0f2f5;
         }
 
-        .buttons, .login-form {
+        .form-container {
             display: flex;
             flex-direction: column;
-            gap: 15px;
+            align-items: center;
+            gap: 20px;
         }
 
-        a.button {
-            text-decoration: none;
-            background-color: #007BFF;
-            color: white;
-            padding: 15px 30px;
-            border-radius: 8px;
-            font-weight: bold;
-            text-align: center;
-            transition: background-color 0.3s;
-        }
-
-        a.button:hover {
-            background-color: #0056b3;
-        }
-
-        input, button {
+        input, button, a.button {
             padding: 10px;
             border-radius: 5px;
             border: 1px solid #ccc;
             font-size: 16px;
             width: 250px;
+            text-align: center;
         }
 
-        button {
+        button, a.button {
             background-color: #007BFF;
             color: white;
+            text-decoration: none;
+            font-weight: bold;
             cursor: pointer;
+            transition: background-color 0.3s;
+            border: none;
         }
 
-        button:hover {
+        button:hover, a.button:hover {
             background-color: #0056b3;
         }
 
@@ -61,21 +52,20 @@
     </style>
 </head>
 <body>
-    <div class="buttons">
+    <div class="form-container">
         <h1>Login</h1>
-    </div>
 
-    <form id="loginForm" class="login-form">
-        <input type="text" name="username" placeholder="Usuario" required>
-        <input type="password" name="password" placeholder="Contraseña" required>
-        <button type="submit">Login</button>
-    </form>
+        <!-- Formulario de Login -->
+        <form id="loginForm">
+            <input type="text" name="username" placeholder="Usuario" required>
+            <input type="password" name="password" placeholder="Contraseña" required>
+            <button type="submit">Login</button>
+        </form>
 
-    <div id="loginResult"></div>
+        <div id="loginResult"></div>
 
-    <!-- Botones de navegación -->
-    <div class="buttons">
-        <a href="/auth/register/" class="button">Registrarse</a>
+        <!-- Botón de Registro -->
+        <a href="/register/" class="button">Registrarse</a>
     </div>
 
     <script>
@@ -92,26 +82,22 @@
             };
 
             try {
-                const response = await fetch('/auth/login/', {
+                const response = await fetch('/login/', {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
+                    headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(data)
                 });
 
                 const resData = await response.json();
 
                 if (response.ok) {
-                    // Login exitoso, guardar tokens en localStorage
                     localStorage.setItem('access_token', resData.access);
                     localStorage.setItem('refresh_token', resData.refresh);
                     resultDiv.style.color = 'green';
                     resultDiv.textContent = 'Login exitoso! Redirigiendo...';
 
-                    // Redirigir al dashboard
                     setTimeout(() => {
-                        window.location.href = '/auth/dashboard/';
+                        window.location.href = '/dashboard/';
                     }, 1000);
                 } else {
                     resultDiv.style.color = 'red';
