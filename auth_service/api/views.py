@@ -1,6 +1,6 @@
 from rest_framework import generics, permissions, status
 from rest_framework.response import Response
-from django.shortcuts import render, redirect
+from django.shortcuts import render
 from django.contrib.auth import get_user_model
 from .serializers import RegisterSerializer, UserSerializer
 from django.views.generic import TemplateView
@@ -8,28 +8,14 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 
 User = get_user_model()
 
+
+# Dashboard del usuario
 class DashboardView(LoginRequiredMixin, TemplateView):
     template_name = "api/dashboard.html"
-    login_url = '/login/'
-
-class RegisterView(generics.CreateAPIView):
-    queryset = User.objects.all()
-    serializer_class = RegisterSerializer
-    permission_classes = (permissions.AllowAny,)
-
-    def get(self, request):
-        return render(request, "api/register.html")
-
-    def create(self, request, *args, **kwargs):
-        serializer = self.get_serializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        self.perform_create(serializer)
-
-        return redirect('dashboard')
-
-User = get_user_model()
+    login_url = '/auth/login/'  # Ajusta al gateway
 
 
+# Registro de usuario
 class RegisterView(generics.CreateAPIView):
     queryset = User.objects.all()
     serializer_class = RegisterSerializer
@@ -39,20 +25,20 @@ class RegisterView(generics.CreateAPIView):
     def get(self, request):
         return render(request, "api/register.html")
 
-    # Sobrescribir create para redirigir después de registro
+    # Crear usuario (POST)
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         self.perform_create(serializer)
 
-        # Aquí rediriges al dashboard (puedes usar nombre de url)
-        return redirect('dashboard')  # 'dashboard' es el name de tu path
+        # Devolver JSON en vez de redirect
+        return Response(
+            {"message": "Usuario creado con éxito"},
+            status=status.HTTP_201_CREATED
+        )
 
-        # Si quieres devolver JSON en vez de redirigir, podrías usar:
-        # return Response(serializer.data, status=status.HTTP_201_CREATED)
 
-
-#Perfil
+# Perfil del usuario
 class ProfileView(generics.RetrieveUpdateAPIView):
     queryset = User.objects.all()
     serializer_class = UserSerializer
@@ -61,7 +47,8 @@ class ProfileView(generics.RetrieveUpdateAPIView):
     def get_object(self):
         return self.request.user
 
-#Home público
+
+# Home público
 class HomeView(generics.GenericAPIView):
     permission_classes = (permissions.AllowAny,)
 
