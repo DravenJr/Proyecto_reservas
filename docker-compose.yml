@@ -1,7 +1,7 @@
 version: '3.8'
 
 services:
-  #RabbitMQ para mensajería asíncrona (opcional)
+  # RabbitMQ para mensajería asíncrona (opcional)
   rabbitmq:
     image: rabbitmq:3-management
     ports:
@@ -32,6 +32,7 @@ services:
     depends_on:
       auth_service_db:
         condition: service_healthy
+    command: gunicorn config.wsgi:application --bind 0.0.0.0:8000
 
   auth_service_db:
     image: postgres:15
@@ -60,6 +61,7 @@ services:
     depends_on:
       roles_service_db:
         condition: service_healthy
+    command: gunicorn config.wsgi:application --bind 0.0.0.0:8000
 
   roles_service_db:
     image: postgres:15
@@ -88,6 +90,7 @@ services:
     depends_on:
       fields_service_db:
         condition: service_healthy
+    command: gunicorn config.wsgi:application --bind 0.0.0.0:8000
 
   fields_service_db:
     image: postgres:15
@@ -116,6 +119,7 @@ services:
     depends_on:
       bookings_service_db:
         condition: service_healthy
+    command: gunicorn config.wsgi:application --bind 0.0.0.0:8000
 
   bookings_service_db:
     image: postgres:15
@@ -144,6 +148,7 @@ services:
     depends_on:
       admin_dashboard_db:
         condition: service_healthy
+    command: gunicorn config.wsgi:application --bind 0.0.0.0:8000
 
   admin_dashboard_db:
     image: postgres:15

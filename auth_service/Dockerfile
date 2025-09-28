@@ -12,4 +12,6 @@ COPY . /app
 ENV PYTHONUNBUFFERED=1
 
 #Ejecutar migraciones y luego levantar Gunicorn
-CMD ["sh", "-c", "python manage.py migrate && gunicorn config.wsgi:application --bind 0.0.0.0:8000"]
+CMD ["gunicorn", "config.wsgi:application", "--bind", "0.0.0.0:8000"]
+
+
