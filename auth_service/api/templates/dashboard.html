@@ -26,6 +26,7 @@
             text-align: center;
             transition: background-color 0.3s;
             width: 200px;
+            cursor: pointer;
         }
 
         .button:hover {
@@ -42,33 +43,30 @@
 <body>
     <div id="welcome">Bienvenido</div>
 
-    <a href="/fields-page/" class="button">Canchas</a>
-    <a href="/bookings-page/" class="button">Reservar</a>
-    <a href="/profile-page/" class="button">Configuración</a>
+    <a href="/fields/" class="button">Canchas</a>
+    <a href="/bookings/" class="button">Reservar</a>
+    <a href="/me/" class="button">Perfil</a>
     <button id="logoutBtn" class="button">Cerrar Sesión</button>
 
     <script>
         const token = localStorage.getItem('access_token');
 
-        // Si no hay token, redirige al login
+        // Si no hay token, redirige al inicio
         if (!token) {
             window.location.href = '/';
         } else {
             // Obtener info del usuario usando el token
-            fetch('/me/', {  // ⚠ URL corregida
+            fetch('/me/', {  
                 headers: {
                     'Authorization': 'Bearer ' + token
                 }
             })
             .then(res => {
-                if (!res.ok) {
-                    throw new Error('Token inválido o expirado');
-                }
+                if (!res.ok) throw new Error('Token inválido o expirado');
                 return res.json();
             })
             .then(data => {
-                const welcomeDiv = document.getElementById('welcome');
-                welcomeDiv.textContent = `Bienvenido, ${data.username}`;
+                document.getElementById('welcome').textContent = `Bienvenido, ${data.username}`;
             })
             .catch(err => {
                 console.error(err);
@@ -79,8 +77,7 @@
         }
 
         // Cerrar sesión
-        const logoutBtn = document.getElementById('logoutBtn');
-        logoutBtn.addEventListener('click', () => {
+        document.getElementById('logoutBtn').addEventListener('click', () => {
             localStorage.removeItem('access_token');
             localStorage.removeItem('refresh_token');
             window.location.href = '/';
