@@ -57,6 +57,7 @@
         <input type="text" name="username" placeholder="Usuario" required />
         <input type="email" name="email" placeholder="Email" required />
         <input type="password" name="password" placeholder="Contraseña" required />
+        <input type="password" name="confirm_password" placeholder="Confirmar Contraseña" required />
         <button type="submit">Registrarse</button>
     </form>
 
@@ -69,10 +70,19 @@
         form.addEventListener('submit', async (e) => {
             e.preventDefault();
 
+            const password = form.password.value;
+            const confirmPassword = form.confirm_password.value;
+
+            if (password !== confirmPassword) {
+                message.style.color = 'red';
+                message.textContent = "Las contraseñas no coinciden.";
+                return;
+            }
+
             const data = {
                 username: form.username.value,
                 email: form.email.value,
-                password: form.password.value
+                password: password
             };
 
             try {

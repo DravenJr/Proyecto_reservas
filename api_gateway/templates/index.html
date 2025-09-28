@@ -61,8 +61,31 @@
     <p>Selecciona un servicio:</p>
     <a href="/auth" class="btn">Login</a>
     <a href="/fields" class="btn">Canchas</a>
-    <a href="/bookings-page" class="btn">Reservas</a>
+    <a href="/bookings-page" class="btn" id="bookings-btn">Reservas</a>
     <a href="/admin" class="btn">Dashboard</a>
   </main>
+
+  <script>
+    const bookingsBtn = document.getElementById('bookings-btn');
+
+    bookingsBtn.addEventListener('click', async (e) => {
+      e.preventDefault();
+
+      try {
+        const res = await fetch('/api/bookings/');
+        const data = await res.json();
+
+        if (res.status === 403) {
+          alert(data.detail);
+          window.location.href = '/';
+        } else {
+          window.location.href = '/bookings-page';
+        }
+      } catch (error) {
+        alert("Error al conectar con el servidor.");
+        console.error(error);
+      }
+    });
+  </script>
 </body>
 </html>

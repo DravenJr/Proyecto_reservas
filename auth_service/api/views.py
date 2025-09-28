@@ -12,7 +12,7 @@ User = get_user_model()
 #Dashboard del usuario
 class DashboardView(LoginRequiredMixin, TemplateView):
     template_name = "api/dashboard.html"
-    login_url = '/auth/login/'  # Ajusta al gateway
+    login_url = '/auth/login/'
 
 
 #Registro de usuario

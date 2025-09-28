@@ -51,11 +51,9 @@
     <script>
         const token = localStorage.getItem('access_token');
 
-        //Si no hay token, redirige al inicio del auth gateway
         if (!token) {
             window.location.href = '/auth/';
         } else {
-            //Obtener info del usuario usando el token desde auth_service vía gateway
             fetch('/auth/me/', {
                 headers: {
                     'Authorization': 'Bearer ' + token
