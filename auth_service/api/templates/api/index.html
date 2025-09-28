@@ -7,9 +7,8 @@
         body {
             font-family: Arial, sans-serif;
             display: flex;
-            flex-direction: column;
-            align-items: center;
             justify-content: center;
+            align-items: center;
             min-height: 100vh;
             margin: 0;
             background-color: #f0f2f5;
@@ -26,30 +25,46 @@
             box-shadow: 0 0 15px rgba(0,0,0,0.1);
         }
 
-        input, button, a.button {
+        form {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            width: 100%;
+        }
+
+        input {
             padding: 10px;
             border-radius: 5px;
             border: 1px solid #ccc;
             font-size: 16px;
-            width: 250px;
-            text-align: center;
+            width: 100%;
+        }
+
+        .buttons {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-top: 10px;
         }
 
         button, a.button {
-            background-color: #007BFF;
-            color: white;
-            text-decoration: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            font-size: 16px;
             font-weight: bold;
+            text-decoration: none;
+            color: white;
             cursor: pointer;
-            transition: background-color 0.3s;
             border: none;
+            background-color: #007BFF;
+            transition: background-color 0.3s;
         }
 
         button:hover, a.button:hover {
             background-color: #0056b3;
         }
 
-        #loginResult {
+        #loginResult, #registerResult {
             margin-top: 10px;
             font-weight: bold;
             text-align: center;
@@ -57,64 +72,65 @@
     </style>
 </head>
 <body>
-    <div class="form-container">
-        <h1>Login</h1>
 
-        <!-- Formulario de Login -->
-        <form id="loginForm" style="display: flex; flex-direction: column; gap: 10px;">
-            <input type="text" name="username" placeholder="Usuario" required>
-            <input type="password" name="password" placeholder="Contraseña" required>
+<div class="form-container">
+    <h1>Login</h1>
+
+    <form id="loginForm">
+        <input type="text" name="username" placeholder="Usuario" required>
+        <input type="password" name="password" placeholder="Contraseña" required>
+        <div class="buttons">
             <button type="submit">Login</button>
-        </form>
+            <a href="/auth/register/" class="button">Registrarse</a>
+        </div>
+    </form>
 
-        <div id="loginResult"></div>
+    <div id="loginResult"></div>
+</div>
 
-        <!-- Botón de Registro -->
-        <a href="/auth/register/" class="button">Registrarse</a>
-    </div>
+<script>
+    const form = document.getElementById('loginForm');
+    const resultDiv = document.getElementById('loginResult');
 
-    <script>
-        const form = document.getElementById('loginForm');
-        const resultDiv = document.getElementById('loginResult');
+    form.addEventListener('submit', async (e) => {
+        e.preventDefault();
 
-        form.addEventListener('submit', async (e) => {
-            e.preventDefault();
+        const formData = new FormData(form);
+        const data = {
+            username: formData.get('username'),
+            password: formData.get('password')
+        };
 
-            const formData = new FormData(form);
-            const data = {
-                username: formData.get('username'),
-                password: formData.get('password')
-            };
+        try {
+            const response = await fetch('/auth/login/', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            });
 
-            try {
-                const response = await fetch('/auth/login/', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(data)
-                });
+            const resData = await response.json();
 
-                const resData = await response.json();
+            if (response.ok) {
+                localStorage.setItem('access_token', resData.access);
+                localStorage.setItem('refresh_token', resData.refresh);
+                resultDiv.style.color = 'green';
+                resultDiv.textContent = 'Login exitoso! Redirigiendo...';
 
-                if (response.ok) {
-                    localStorage.setItem('access_token', resData.access);
-                    localStorage.setItem('refresh_token', resData.refresh);
-                    resultDiv.style.color = 'green';
-                    resultDiv.textContent = 'Login exitoso! Redirigiendo...';
-
-                    setTimeout(() => {
-                        window.location.href = '/auth/dashboard/';
-                    }, 1000);
-                } else {
-                    resultDiv.style.color = 'red';
-                    resultDiv.textContent = resData.detail || 'Error en login';
-                }
-
-            } catch (error) {
+                setTimeout(() => {
+                    window.location.href = '/auth/dashboard/';
+                }, 1000);
+            } else {
                 resultDiv.style.color = 'red';
-                resultDiv.textContent = 'Error de conexión con el servidor';
-                console.error(error);
+                resultDiv.textContent = resData.detail || 'Error en login';
             }
-        });
-    </script>
+
+        } catch (error) {
+            resultDiv.style.color = 'red';
+            resultDiv.textContent = 'Error de conexión con el servidor';
+            console.error(error);
+        }
+    });
+</script>
+
 </body>
 </html>
