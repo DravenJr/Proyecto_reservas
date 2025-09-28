@@ -7,14 +7,12 @@ import os
 app = FastAPI()
 templates = Jinja2Templates(directory="templates")
 
-# ===== Ruta principal =====
 @app.get("/", response_class=HTMLResponse)
 async def home(request: Request):
     return templates.TemplateResponse("index.html", {"request": request})
 
 @app.get("/bookings-page", response_class=HTMLResponse)
 async def bookings_page(request: Request):
-    # TODO: reemplazar con tu lógica real de autenticación
     user_authenticated = False
 
     if not user_authenticated:

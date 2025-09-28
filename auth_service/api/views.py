@@ -9,7 +9,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 User = get_user_model()
 
 class DashboardView(LoginRequiredMixin, TemplateView):
-    template_name = "dashboard.html"
+    template_name = "api/dashboard.html"
     login_url = '/login/'
 
 class RegisterView(generics.CreateAPIView):
@@ -18,7 +18,7 @@ class RegisterView(generics.CreateAPIView):
     permission_classes = (permissions.AllowAny,)
 
     def get(self, request):
-        return render(request, "register.html")
+        return render(request, "api/register.html")
 
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
@@ -37,7 +37,7 @@ class RegisterView(generics.CreateAPIView):
 
     # Mostrar formulario HTML
     def get(self, request):
-        return render(request, "register.html")
+        return render(request, "api/register.html")
 
     # Sobrescribir create para redirigir después de registro
     def create(self, request, *args, **kwargs):
@@ -66,4 +66,4 @@ class HomeView(generics.GenericAPIView):
     permission_classes = (permissions.AllowAny,)
 
     def get(self, request):
-        return render(request, "index.html")
+        return render(request, "api/index.html")
