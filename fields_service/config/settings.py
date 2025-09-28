@@ -46,7 +46,6 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'config.wsgi.application'
 
-# Database - simplificada: use DATABASE_URL en variables de entorno en cada contenedor
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
@@ -57,6 +56,7 @@ DATABASES = {
         'PORT': os.environ.get('DB_PORT', '5432'),
     }
 }
+
 
 AUTH_PASSWORD_VALIDATORS = []
 

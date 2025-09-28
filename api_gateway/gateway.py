@@ -7,12 +7,12 @@ import os
 app = FastAPI()
 templates = Jinja2Templates(directory="templates")
 
-# Servir la página principal
+#Servir la página principal
 @app.get("/", response_class=HTMLResponse)
 async def home(request: Request):
     return templates.TemplateResponse("index.html", {"request": request})
 
-# Mapa de servicios para el proxy
+#Mapa de servicios para el proxy
 SERVICE_MAP = {
     '/auth': os.environ.get('AUTH_URL', 'http://auth_service:8000'),
     '/roles': os.environ.get('ROLES_URL', 'http://roles_service:8000'),
@@ -21,14 +21,14 @@ SERVICE_MAP = {
     '/admin': os.environ.get('ADMIN_URL', 'http://admin_dashboard:8000'),
 }
 
-# Proxy genérico para todos los servicios
+#Proxy genérico para todos los servicios
 @app.api_route('/{path:path}', methods=['GET', 'POST', 'PUT', 'PATCH', 'DELETE'])
 async def proxy(path: str, request: Request):
     full_path = '/' + path
     target_base = None
     prefix = None
 
-    # Encontrar el servicio correspondiente
+    #Encontrar el servicio correspondiente
     for p, target in SERVICE_MAP.items():
         if full_path.startswith(p):
             prefix = p
@@ -38,14 +38,14 @@ async def proxy(path: str, request: Request):
     if not target_base:
         return Response(content='Service not found', status_code=404)
 
-    # Ajustar la ruta a enviar al servicio
+    #Ajustar la ruta a enviar al servicio
     forwarded_path = full_path[len(prefix):] if prefix else full_path
     if not forwarded_path.startswith('/'):
         forwarded_path = '/' + forwarded_path
 
     url = target_base + forwarded_path
 
-    # Reenviar la solicitud
+    #Reenviar la solicitud
     async with httpx.AsyncClient() as client:
         headers = dict(request.headers)
         body = await request.body()
@@ -57,7 +57,7 @@ async def proxy(path: str, request: Request):
             params=request.query_params
         )
 
-    # Devolver la respuesta tal cual
+    #Devolver la respuesta tal cual
     return Response(
         content=resp.content,
         status_code=resp.status_code,

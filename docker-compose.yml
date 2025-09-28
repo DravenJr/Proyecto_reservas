@@ -24,7 +24,11 @@ services:
     ports:
       - "8000:8000"
     environment:
-      - DATABASE_URL=postgres://postgres:postgres@auth_service_db:5432/auth_service
+      - POSTGRES_DB=auth_service
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - DB_HOST=auth_service_db
+      - DB_PORT=5432
     depends_on:
       - auth_service_db
 
@@ -42,7 +46,11 @@ services:
     ports:
       - "8001:8000"
     environment:
-      - DATABASE_URL=postgres://postgres:postgres@roles_service_db:5432/roles_service
+      - POSTGRES_DB=roles_service
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - DB_HOST=roles_service_db
+      - DB_PORT=5432
     depends_on:
       - roles_service_db
 
@@ -60,7 +68,11 @@ services:
     ports:
       - "8002:8000"
     environment:
-      - DATABASE_URL=postgres://postgres:postgres@fields_service_db:5432/fields_service
+      - POSTGRES_DB=fields_service
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - DB_HOST=fields_service_db
+      - DB_PORT=5432
     depends_on:
       - fields_service_db
 
@@ -78,7 +90,11 @@ services:
     ports:
       - "8003:8000"
     environment:
-      - DATABASE_URL=postgres://postgres:postgres@bookings_service_db:5432/bookings_service
+      - POSTGRES_DB=bookings_service
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - DB_HOST=bookings_service_db
+      - DB_PORT=5432
     depends_on:
       - bookings_service_db
 
@@ -96,7 +112,11 @@ services:
     ports:
       - "8004:8000"
     environment:
-      - DATABASE_URL=postgres://postgres:postgres@admin_dashboard_db:5432/admin_dashboard
+      - POSTGRES_DB=admin_dashboard
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - DB_HOST=admin_dashboard_db
+      - DB_PORT=5432
     depends_on:
       - admin_dashboard_db
 

@@ -1,4 +1,3 @@
-# Imagen base Python
 FROM python:3.11-slim
 
 WORKDIR /app
@@ -8,7 +7,6 @@ RUN pip install --no-cache-dir -r /app/requirements.txt
 
 COPY . /app
 
-# Variable de entorno para Django
 ENV PYTHONUNBUFFERED=1
 
 CMD ["gunicorn", "config.wsgi:application", "--bind", "0.0.0.0:8000"]
