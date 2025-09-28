@@ -1,11 +1,11 @@
 version: '3.8'
 
 services:
-  # RabbitMQ para mensajería asíncrona (opcional)
+  #RabbitMQ para mensajería asíncrona (opcional)
   rabbitmq:
     image: rabbitmq:3-management
     ports:
-      - "15672:15672" # UI management
+      - "15672:15672"
       - "5672:5672"
 
   api_gateway:
@@ -30,7 +30,8 @@ services:
       - DB_HOST=auth_service_db
       - DB_PORT=5432
     depends_on:
-      - auth_service_db
+      auth_service_db:
+        condition: service_healthy
 
   auth_service_db:
     image: postgres:15
@@ -40,6 +41,11 @@ services:
       - POSTGRES_DB=auth_service
     volumes:
       - auth_service_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      retries: 10
+      start_period: 5s
 
   roles_service:
     build: ./roles_service
@@ -52,7 +58,8 @@ services:
       - DB_HOST=roles_service_db
       - DB_PORT=5432
     depends_on:
-      - roles_service_db
+      roles_service_db:
+        condition: service_healthy
 
   roles_service_db:
     image: postgres:15
@@ -62,6 +69,11 @@ services:
       - POSTGRES_DB=roles_service
     volumes:
       - roles_service_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      retries: 10
+      start_period: 5s
 
   fields_service:
     build: ./fields_service
@@ -74,7 +86,8 @@ services:
       - DB_HOST=fields_service_db
       - DB_PORT=5432
     depends_on:
-      - fields_service_db
+      fields_service_db:
+        condition: service_healthy
 
   fields_service_db:
     image: postgres:15
@@ -84,6 +97,11 @@ services:
       - POSTGRES_DB=fields_service
     volumes:
       - fields_service_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      retries: 10
+      start_period: 5s
 
   bookings_service:
     build: ./bookings_service
@@ -96,7 +114,8 @@ services:
       - DB_HOST=bookings_service_db
       - DB_PORT=5432
     depends_on:
-      - bookings_service_db
+      bookings_service_db:
+        condition: service_healthy
 
   bookings_service_db:
     image: postgres:15
@@ -106,6 +125,11 @@ services:
       - POSTGRES_DB=bookings_service
     volumes:
       - bookings_service_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      retries: 10
+      start_period: 5s
 
   admin_dashboard:
     build: ./admin_dashboard
@@ -118,7 +142,8 @@ services:
       - DB_HOST=admin_dashboard_db
       - DB_PORT=5432
     depends_on:
-      - admin_dashboard_db
+      admin_dashboard_db:
+        condition: service_healthy
 
   admin_dashboard_db:
     image: postgres:15
@@ -128,6 +153,11 @@ services:
       - POSTGRES_DB=admin_dashboard
     volumes:
       - admin_dashboard_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      retries: 10
+      start_period: 5s
 
 volumes:
   auth_service_pgdata:
